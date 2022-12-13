@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/test.yaml
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: test
     steps:
       - uses: actions/checkout@v3
