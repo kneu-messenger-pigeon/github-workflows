@@ -24,5 +24,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-golang-
 
+      - name: Set timezone
+        run: sudo timedatectl set-timezone "Europe/Kyiv"
+
       - name: Test
         run: go test -v .
