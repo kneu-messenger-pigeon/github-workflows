@@ -27,5 +27,8 @@ jobs:
       - name: Set timezone
         run: sudo timedatectl set-timezone "Europe/Kyiv"
 
+      - name: Go module download
+        run: go mod download
+
       - name: Test
         run: go test -v .
