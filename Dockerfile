@@ -1,5 +1,5 @@
 ARG GO_VERSION=${GO_VERSION:-1.19}
-ARG REPOSITORY_NAME=${REPOSITORY_NAME:-app}
+ARG REPOSITORY_NAME=app
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64}  golang:${GO_VERSION}-alpine AS builder
 
