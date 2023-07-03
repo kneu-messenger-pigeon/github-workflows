@@ -17,7 +17,7 @@ jobs:
       - name: Make Dockerfile
         run: |
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
-          [ -f Append.dockerfile ]] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
+          [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
           cat Dockerfile
           cat .dockerignore
