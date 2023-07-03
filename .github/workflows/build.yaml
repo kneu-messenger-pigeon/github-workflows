@@ -45,7 +45,7 @@ jobs:
         with:
           context: .
           build-args: |
-            REPOSITORY_NAME: ${{ github.event.repository.name }}
+            REPOSITORY_NAME:${{ github.event.repository.name }}
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
