@@ -14,11 +14,12 @@ jobs:
           repository: kneu-messenger-pigeon/github-workflows
           path: github-workflows
 
-      - name: Choose Dockerfile
+      - name: Make Dockerfile
         run: |
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
           [ -f Append.dockerfile ]] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           cat Dockerfile
+          echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
