@@ -19,10 +19,6 @@ jobs:
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
           [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
-          cat Dockerfile
-          cat .dockerignore
-          ls -la
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
