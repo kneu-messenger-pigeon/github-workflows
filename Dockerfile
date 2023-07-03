@@ -23,6 +23,8 @@ FROM --platform=${BUILDPLATFORM:-linux/amd64}  alpine
 ENV TZ=Europe/Kyiv
 RUN apk add tzdata
 
+RUN mkdir /storage && chmod 777 -R /storage
+
 COPY --from=builder /etc/passwd.nobody /etc/passwd
 COPY --from=builder /${REPOSITORY_NAME} /${REPOSITORY_NAME}
 
