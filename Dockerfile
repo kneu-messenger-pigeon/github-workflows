@@ -20,7 +20,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -tags=nomsgp
 # build a small image
 FROM --platform=${BUILDPLATFORM:-linux/amd64}  alpine
 ARG REPOSITORY_NAME
-ENV REPOSITORY_NAME="${REPOSITORY_NAME}"
+ENV REPOSITORY_NAME=${REPOSITORY_NAME}
 
 ENV TZ=Europe/Kyiv
 RUN apk add tzdata
@@ -37,4 +37,4 @@ WORKDIR /
 
 # Run
 USER nobody
-ENTRYPOINT ["infisical", "run", "--", "${REPOSITORY_NAME}"]
+ENTRYPOINT infisical run -- /${REPOSITORY_NAME}
