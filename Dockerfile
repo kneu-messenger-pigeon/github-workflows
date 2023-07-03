@@ -24,11 +24,16 @@ ARG REPOSITORY_NAME
 ENV TZ=Europe/Kyiv
 RUN apk add tzdata
 
+RUN apk add --no-cache bash curl && curl -1sLf \
+'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.alpine.sh' | bash \
+&& apk add --no-cache infisical && apk del bash curl
+
 RUN mkdir /storage && chmod 777 -R /storage
 
 COPY --from=builder /etc/passwd.nobody /etc/passwd
 COPY --from=builder /app "/${REPOSITORY_NAME}"
+WORKDIR /
 
 # Run
 USER nobody
-ENTRYPOINT ["/${REPOSITORY_NAME}"]
+ENTRYPOINT ["infisical", "run", "--", "${REPOSITORY_NAME}"]
