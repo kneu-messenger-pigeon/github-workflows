@@ -8,16 +8,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-
       - name: Checkout github-workflows
         uses: actions/checkout@v3
         with:
           repository: kneu-messenger-pigeon/github-workflows
+          path: github-workflows
 
-      - name: Checkout github-workflows
+      - name: Choose Dockerfile
         run: |
-          echo ${{ github.repository }}
-          ls -la
+          [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
+          [ -f Append.dockerfile ]] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           cat Dockerfile
 
       - name: Set up QEMU
