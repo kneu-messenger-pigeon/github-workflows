@@ -13,15 +13,92 @@ on:
 
 jobs:
   test:
-    if: !${{ inputs.skip_test }}
-    uses: ./.github/workflows/test.yaml
+    if: ${{ !inputs.skip_test }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Setup Golang caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
+
+      - name: Set timezone
+        run: sudo timedatectl set-timezone "Europe/Kyiv"
+
+      - name: Go module download
+        run: go mod download
+
+      - name: Test
+        run: go test -v .
 
   build:
     needs: test
-    uses: ./.github/workflows/build.yaml
-    secrets: inherit
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout github-workflows
+        uses: actions/checkout@v3
+        with:
+          repository: kneu-messenger-pigeon/github-workflows
+          path: github-workflows
+
+      - name: Make Dockerfile
+        run: |
+          [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
+          [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
+          echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
+          cat Dockerfile
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4.1.1
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            REPOSITORY_NAME=${{ github.event.repository.name }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   trigger-pigeon:
+    runs-on: ubuntu-22.04
     needs: build
-    uses: ./.github/workflows/trigger-pigeon-app.yaml
-    secrets: inherit
+    steps:
+      - name: Pigeon App Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.TOKEN_TO_RUN_GITHUB_ACTION }}
+          repository: kneu-messenger-pigeon/pigeon-app@main
+          event-type: built_${{ github.event.repository.name }}
