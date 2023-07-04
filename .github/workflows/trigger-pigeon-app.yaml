@@ -14,5 +14,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.TOKEN_TO_RUN_GITHUB_ACTION }}
-          repository: passeidireto/trigger-external-workflow-action@main
+          repository: kneu-messenger-pigeon/pigeon-app@main
           event-type: built_${{ github.event.repository.name }}
