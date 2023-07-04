@@ -47,6 +47,8 @@ jobs:
     # always run build even test skipped
     if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-22.04
+    outputs:
+      imageid: ${{ steps.docker_build.outputs.imageid }}
     steps:
       - uses: actions/checkout@v3
       - name: Checkout github-workflows
@@ -82,6 +84,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
 
       - name: Build and push Docker image
+        id: docker_build
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -94,7 +97,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  trigger-pigeon:
+  dispatch-pigeon:
     runs-on: ubuntu-22.04
     needs: build
     if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
@@ -104,4 +107,5 @@ jobs:
         with:
           token: ${{ secrets.TOKEN_TO_RUN_GITHUB_ACTION }}
           repository: kneu-messenger-pigeon/pigeon-app
-          event-type: built_${{ github.event.repository.name }}
+          event-type: image-built
+          client-payload: '{"image": "${{ github.event.repository.name }}", "digest": "${{ needs.build.outputs.imageid }}"}'
