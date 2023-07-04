@@ -44,6 +44,8 @@ jobs:
 
   build:
     needs: test
+    # always run build even test skipped
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
