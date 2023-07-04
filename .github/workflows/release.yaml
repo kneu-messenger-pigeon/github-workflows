@@ -7,6 +7,10 @@ on:
         description: 'Skip test'
         required: false
         type: boolean
+      skip_build:
+        description: 'Skip build'
+        required: false
+        type: boolean
     secrets:
       TOKEN_TO_RUN_GITHUB_ACTION:
         required: true
@@ -45,7 +49,7 @@ jobs:
   build:
     needs: test
     # always run build even test skipped
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    if: ${{ !inputs.skip_build }} && always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -97,10 +101,11 @@ jobs:
   trigger-pigeon:
     runs-on: ubuntu-22.04
     needs: build
+    if: ${{ !inputs.skip_build }} && always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     steps:
       - name: Pigeon App Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.TOKEN_TO_RUN_GITHUB_ACTION }}
-          repository: kneu-messenger-pigeon/pigeon-app@main
+          repository: kneu-messenger-pigeon/pigeon-app
           event-type: built_${{ github.event.repository.name }}
