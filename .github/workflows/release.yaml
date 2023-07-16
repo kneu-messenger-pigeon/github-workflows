@@ -7,6 +7,10 @@ on:
         description: 'Skip test'
         required: false
         type: boolean
+      skip_build:
+        description: 'Skip test'
+        required: false
+        type: boolean
     secrets:
       TOKEN_TO_RUN_GITHUB_ACTION:
         required: true
@@ -67,7 +71,7 @@ jobs:
   build:
     needs: test
     # always run build even test skipped
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    if: ${{ !inputs.skip_build }} && always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-22.04
     outputs:
       imageid: ${{ steps.docker_build.outputs.imageid }}
@@ -124,7 +128,7 @@ jobs:
   dispatch-pigeon:
     runs-on: ubuntu-22.04
     needs: build
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    if: ${{ !inputs.skip_build }} && always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     steps:
       - name: Pigeon App Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
