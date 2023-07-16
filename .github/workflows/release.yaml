@@ -40,7 +40,7 @@ jobs:
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
           [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
-          sed -i "s/\"\/app\"/\"\/$REPOSITORY_NAME\"/g" Dockerfile
+          sed -i "s/\"\/app\"/\"\/${{ github.event.repository.name }}\"/g" Dockerfile
           cat Dockerfile
         # replace all `"/app"` to `/{REPO_NAME}` to have understandable process name in `ps aux`
       - name: Set up QEMU
@@ -68,8 +68,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          build-args: |
-            REPOSITORY_NAME=${{ github.event.repository.name }}
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
