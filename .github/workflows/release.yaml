@@ -84,9 +84,9 @@ jobs:
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
           [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
           echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
-       # replace all `"/app"` to `/{REPO_NAME}` to have understandable process name in `ps aux`
-          sed -i '' "s/\"\/app\"/\"\/$REPOSITORY_NAME\"/g" Dockerfile
+          sed -i "s/\"\/app\"/\"\/$REPOSITORY_NAME\"/g" Dockerfile
           cat Dockerfile
+        # replace all `"/app"` to `/{REPO_NAME}` to have understandable process name in `ps aux`
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
