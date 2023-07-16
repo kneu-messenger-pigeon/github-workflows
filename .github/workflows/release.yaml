@@ -44,6 +44,10 @@ jobs:
           go test .  -tags test -coverprofile coverage.out -covermode atomic
           go tool cover -func coverage.out
 
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Quality Gate - Test coverage shall be above threshold
         env:
           TESTCOVERAGE_THRESHOLD: 100
