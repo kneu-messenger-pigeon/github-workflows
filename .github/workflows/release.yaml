@@ -38,7 +38,17 @@ jobs:
       - name: Make Dockerfile
         run: |
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
-          [ -f Append.dockerfile ] && echo "" >> Dockerfile && cat Append.dockerfile >> Dockerfile
+          if  [ -f Append.dockerfile ]; then
+             mv Dockerfile Dockerfile.bak
+             USER_STRING_REGEXP='^USER .*$'
+             USER_STRING=$(grep "$USER_STRING_REGEXP" Dockerfile.bak || true)             
+             grep -vE "$USER_STRING_REGEXP" Dockerfile.bak > Dockerfile
+             echo "" >> Dockerfile
+             cat Append.dockerfile >> Dockerfile
+             echo "" >> Dockerfile
+             echo $USER_STRING >> Dockerfile
+             rm Dockerfile.bak
+          fi
           echo "" >> .dockerignore && cat ./github-workflows/.dockerignore >> .dockerignore
           sed -i "s/\"\/app\"/\"\/${{ github.event.repository.name }}\"/g" Dockerfile
           cat Dockerfile
