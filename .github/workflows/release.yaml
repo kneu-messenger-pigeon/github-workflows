@@ -41,7 +41,10 @@ jobs:
           if  [ -f Append.dockerfile ]; then
              mv Dockerfile Dockerfile.bak
              USER_STRING_REGEXP='^USER .*$'
-             USER_STRING=$(grep "$USER_STRING_REGEXP" Dockerfile.bak || true)             
+             USER_STRING=$(grep "$USER_STRING_REGEXP" Append.dockerfile || true)  
+             if [ -z "$USER_STRING" ]; then
+                USER_STRING=$(grep "$USER_STRING_REGEXP" Dockerfile.bak || true)  
+             fi
              grep -vE "$USER_STRING_REGEXP" Dockerfile.bak > Dockerfile
              echo "" >> Dockerfile
              cat Append.dockerfile >> Dockerfile
