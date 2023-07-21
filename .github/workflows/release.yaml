@@ -2,11 +2,6 @@ name: Test and release
 
 on:
   workflow_call:
-    inputs:
-      skip_test:
-        description: 'Skip test'
-        required: false
-        type: boolean
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -15,15 +10,12 @@ on:
 
 jobs:
   test:
-    if: ${{ !inputs.skip_test }}
     uses: ./.github/workflows/test.yaml
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     needs: test
-    # always run build even test skipped
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-22.04
     outputs:
       imageid: ${{ steps.docker_build.outputs.imageid }}
@@ -91,7 +83,6 @@ jobs:
   dispatch-pigeon:
     runs-on: ubuntu-22.04
     needs: build
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     steps:
       - name: Pigeon App Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
