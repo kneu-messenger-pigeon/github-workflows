@@ -8,13 +8,16 @@ RUN apk update && apk add --no-cache git
 WORKDIR /src
 
 RUN cat /etc/passwd | grep "${USER}" > /etc/passwd.user
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=bind,source=go.sum,target=go.sum \
+RUN --mount=type=bind,source=go.sum,target=go.sum \
     --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
     go mod download
 
 # Build the binary.
 RUN --mount=type=bind,target=. \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
     go build -ldflags="-w -s" -tags=nomsgpack -o "/app" .
 

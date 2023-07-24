@@ -24,16 +24,6 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
 
-      - name: Setup Golang caches
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ inputs.go-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-golang-${{ inputs.go-version }}-
-
       - name: Set timezone
         run: sudo timedatectl set-timezone "Europe/Kyiv"
 
