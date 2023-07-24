@@ -9,13 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-22.04
+    env:
+      GO_VERSION: 1.20
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: {{ env.GO_VERSION }}
 
       - name: Setup Golang caches
         uses: actions/cache@v3
@@ -23,9 +25,9 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-golang-{{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-golang-
+            ${{ runner.os }}-golang-{{ env.GO_VERSION }}-
 
       - name: Set timezone
         run: sudo timedatectl set-timezone "Europe/Kyiv"

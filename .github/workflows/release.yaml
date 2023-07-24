@@ -37,6 +37,13 @@ jobs:
         run: |
           [ -f Dockerfile ] || cp ./github-workflows/Dockerfile Dockerfile
           if  [ -f Append.dockerfile ]; then
+
+             mv Dockerfile Dockerfile.bak
+             USER_STRING_REGEXP='^USER .*$'
+             USER_STRING=$(grep "$USER_STRING_REGEXP" Append.dockerfile || grep "$USER_STRING_REGEXP" Dockerfile.bak || true) 
+             grep -vE "$USER_STRING_REGEXP" Dockerfile.bak > Dockerfile
+             rm Dockerfile.bak
+
              echo "" >> Dockerfile
              cat Append.dockerfile >> Dockerfile
              echo "" >> Dockerfile
