@@ -3,11 +3,18 @@ name: Test and release
 on:
   workflow_call:
     inputs:
-      docker_root_user:
+      go-version:
+        description: 'Go version to use'
+        type: string
+        required: false
+        default: '1.20'
+
+      docker-root-user:
         description: 'Use `root` in docker image (not nobody)'
         type: boolean
         default: false
         required: false
+
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -19,6 +26,8 @@ jobs:
     uses: ./.github/workflows/test.yaml
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      go-version: ${{ inputs.go-version }}
 
   build:
     needs: test
@@ -54,7 +63,7 @@ jobs:
         # replace all `"/app"` to `/{REPO_NAME}` to have understandable process name in `ps aux`
       - name: Choose docker user
         id: docker_user
-        run: if ${{ inputs.docker_root_user }}; then echo "USER=root"; else echo "USER=nobody"; fi >> $GITHUB_OUTPUT
+        run: if ${{ inputs.docker-root-user }}; then echo "USER=root"; else echo "USER=nobody"; fi >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
@@ -87,6 +96,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
+            GO_VERSION=${{ inputs.go-version }}
             USER=${{ steps.docker_user.outputs.USER }}
 
   dispatch-pigeon:
