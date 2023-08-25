@@ -15,6 +15,12 @@ on:
         default: false
         required: false
 
+      test-coverage-threshold:
+        description: 'Test coverage threshold'
+        required: false
+        type: number
+        default: 100
+
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -28,6 +34,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     with:
       go-version: ${{ inputs.go-version }}
+      test-coverage-threshold: ${{ inputs.test-coverage-threshold }}
 
   build:
     needs: test
