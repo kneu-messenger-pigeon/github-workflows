@@ -41,7 +41,7 @@ jobs:
           go test .  -tags test -coverprofile coverage.out -covermode atomic
           go tool cover -func coverage.out
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
