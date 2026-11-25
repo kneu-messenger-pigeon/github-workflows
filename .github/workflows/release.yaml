@@ -38,13 +38,13 @@ jobs:
 
   build:
     needs: test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       imageid: ${{ steps.docker_build.outputs.imageid }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Checkout github-workflows
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: kneu-messenger-pigeon/github-workflows
           path: github-workflows
@@ -72,14 +72,14 @@ jobs:
         id: docker_user
         run: if ${{ inputs.docker-root-user }}; then echo "USER=root"; else echo "USER=nobody"; fi >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: linux/amd64,linux/arm64
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -87,13 +87,13 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
 
       - name: Build and push Docker image
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
@@ -111,7 +111,7 @@ jobs:
     needs: build
     steps:
       - name: Pigeon App Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.TOKEN_TO_RUN_GITHUB_ACTION }}
           repository: kneu-messenger-pigeon/pigeon-app
